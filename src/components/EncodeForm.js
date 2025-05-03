@@ -148,22 +148,23 @@ const EncodeForm = () => {
       )}
 
       <Button variant="contained" onClick={handleEncode} sx={{ mt: 2 }}>
-        Encode
+        Embed
       </Button>
 
       {loading && <CircularProgress sx={{ mt: 2 }} />}
 
       {outputText && (
         <Box mt={4}>
-          <Typography variant="h6">Encoded Text:</Typography>
+          <Typography variant="h6">Stego Text:</Typography>
           <Typography>{outputText}</Typography>
         </Box>
       )}
 
       {outputImage && (
         <Box mt={4}>
-          <Typography variant="h6">Encoded Image:</Typography>
-          <img src={outputImage} alt="Encoded result" width="100%" style={{ marginBottom: '10px' }} />
+          <Typography variant="h6">Stego Image:</Typography>
+          <img src={outputImage} alt="Encoded result" style={{ marginBottom: '10px', width: "128px", height:"128px" }} />
+          <br/>
           <a href={outputImage} download="encoded_output.png">
             <Button variant="outlined">Download Image</Button>
           </a>

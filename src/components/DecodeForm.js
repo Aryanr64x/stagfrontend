@@ -99,23 +99,23 @@ const DecodeForm = () => {
         </Box>
       )}
 
-      <Button variant="contained" onClick={handleDecode} sx={{ mt: 2 }}>
-        Decode
+      <Button variant="contained" onClick={handleDecode} sx={{ mt: 2, mr: 2 }}>
+        Reveal
       </Button>
 
-      {loading && <CircularProgress sx={{ mt: 2 }} />}
+      {loading && <CircularProgress sx={{ mt: 3 }} />}
 
       {decodedText && (
         <Box mt={4}>
-          <Typography variant="h6">Decoded Message:</Typography>
+          <Typography variant="h6">Hidden Message:</Typography>
           <Typography>{decodedText}</Typography>
         </Box>
       )}
 
       {decodedImage && (
         <Box mt={4}>
-          <Typography variant="h6">Decoded Image:</Typography>
-          <img src={decodedImage} alt="Decoded result" width="100%" />
+          <Typography variant="h6">Hidden Image:</Typography>
+          <img src={decodedImage} alt="Decoded result" style={{ marginBottom: '10px', width: "128px", height:"128px" }} />
         </Box>
       )}
     </Box>

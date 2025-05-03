@@ -7,14 +7,14 @@ const Navbar = () => {
     <AppBar position="static" sx={{ bgcolor: '#2c3e50' }}>
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Steganography Studio
+          Whispers Within 🕵️‍♂️
         </Typography>
         <Box>
           <Button color="inherit" component={Link} to="/">
-            Encode
+            Embed
           </Button>
           <Button color="inherit" component={Link} to="/decode">
-            Decode
+            Reveal
           </Button>
         </Box>
       </Toolbar>
