@@ -15,11 +15,13 @@ const EncodeForm = () => {
   const [loading, setLoading] = useState(false);
   const [outputText, setOutputText] = useState('');
   const [outputImage, setOutputImage] = useState(null);
+  const [outputAudio, setOutputAudio] = useState(null);
 
   const handleEncode = async () => {
     setLoading(true);
     setOutputText('');
     setOutputImage(null);
+    setOutputAudio(null);
 
     try {
       let response;
@@ -29,12 +31,23 @@ const EncodeForm = () => {
           cover: coverText,
           secret: secretText
         });
-        if(method === 'zwc') {
-          setOutputText(response.data.embedded_text)
+        if (method === 'zwc') {
+          setOutputText(response.data.embedded_text);
         } else {
-          setOutputText(response.data.stego_text)
+          setOutputText(response.data.stego_text);
         }
-        console.log(outputText);
+      } else if (method === 'textinaudio') {
+        const formData = new FormData();
+        formData.append('secret', secretText);
+        formData.append('cover', coverFile);
+
+        response = await axios.post(`${API_BASE_URL}embed/text-in-audio`, formData, {
+          responseType: 'blob'
+        });
+        const audioUrl = URL.createObjectURL(response.data);
+        setOutputText(''); // Clear any text
+        setOutputImage(null); // Clear any image
+        setOutputAudio(audioUrl);
       } else {
         const formData = new FormData();
         formData.append('secret', secretText);
@@ -63,7 +76,7 @@ const EncodeForm = () => {
         setOutputImage(imageUrl);
       }
     } catch (err) {
-      alert("Encoding failed: " + (err.response?.data?.detail || err.message));
+      alert("Encoding failed: " + (err.response?.data?.detail.message || err.message));
     }
 
     setLoading(false);
@@ -84,6 +97,7 @@ const EncodeForm = () => {
           <MenuItem value="lsb-rgb">Text ➜ Image (RGB LSB)</MenuItem>
           <MenuItem value="imginimg">Image ➜ Image (LSB)</MenuItem>
           <MenuItem value="deep">Image ➜ Image (Deep Learning)</MenuItem>
+          <MenuItem value="textinaudio">Text ➜ Audio</MenuItem> {/* New method */}
         </Select>
       </FormControl>
 
@@ -147,6 +161,26 @@ const EncodeForm = () => {
         </>
       )}
 
+      {method === 'textinaudio' && (
+        <>
+          <Typography>Upload Cover Audio:</Typography>
+          <input
+            type="file"
+            accept="audio/*"
+            onChange={(e) => setCoverFile(e.target.files[0])}
+          />
+          <TextField
+            label="Secret Text"
+            fullWidth
+            multiline
+            rows={2}
+            value={secretText}
+            onChange={(e) => setSecretText(e.target.value)}
+            margin="normal"
+          />
+        </>
+      )}
+
       <Button variant="contained" onClick={handleEncode} sx={{ mt: 2 }}>
         Embed
       </Button>
@@ -167,6 +201,16 @@ const EncodeForm = () => {
           <br/>
           <a href={outputImage} download="encoded_output.png">
             <Button variant="outlined">Download Image</Button>
+          </a>
+        </Box>
+      )}
+
+      {outputAudio && (
+        <Box mt={4}>
+          <Typography variant="h6">Stego Audio:</Typography>
+          <audio controls src={outputAudio} style={{ display: 'block', marginBottom: '10px' }} />
+          <a href={outputAudio} download="encoded_output.wav">
+            <Button variant="outlined">Download Audio</Button>
           </a>
         </Box>
       )}

@@ -21,12 +21,18 @@ const DecodeForm = () => {
 
     try {
       let response;
+
       if (method === 'zwc' || method === 'homoglyph') {
         const endpoint = method === 'zwc' ? 'recover/text-to-text-zwc' : 'recover/text-to-text-uh';
         response = await axios.post(`${API_BASE_URL}${endpoint}`, {
           embedded: inputText
         });
         setDecodedText(response.data.recovered_secret);
+      } else if (method === 'audio') {
+        const formData = new FormData();
+        formData.append('embedded', inputFile);
+        response = await axios.post(`${API_BASE_URL}recover/text-in-audio`, formData);
+        setDecodedText(response.data.decoded_message);
       } else {
         const formData = new FormData();
         formData.append('embedded', inputFile);
@@ -36,9 +42,13 @@ const DecodeForm = () => {
           formData.delete('embedded');
           formData.append('image', inputFile);
           endpoint = 'recover/text-in-image-lsb';
-        } else if (method === 'lsb-rgb') endpoint = 'recover/text-in-image-lsb-rgb';
-        else if (method === 'imginimg') endpoint = 'recover/image-in-image';
-        else if (method === 'deep') endpoint = 'reveal/image-to-image-deep';
+        } else if (method === 'lsb-rgb') {
+          endpoint = 'recover/text-in-image-lsb-rgb';
+        } else if (method === 'imginimg') {
+          endpoint = 'recover/image-in-image';
+        } else if (method === 'deep') {
+          endpoint = 'reveal/image-to-image-deep';
+        }
 
         response = await axios.post(`${API_BASE_URL}${endpoint}`, formData, {
           responseType: method === 'imginimg' || method === 'deep' ? 'blob' : 'json'
@@ -73,6 +83,7 @@ const DecodeForm = () => {
           <MenuItem value="lsb-rgb">Image ➜ Text (RGB LSB)</MenuItem>
           <MenuItem value="imginimg">Image ➜ Image (LSB)</MenuItem>
           <MenuItem value="deep">Image ➜ Image (Deep Learning)</MenuItem>
+          <MenuItem value="audio">Audio ➜ Text</MenuItem>
         </Select>
       </FormControl>
 
@@ -90,10 +101,12 @@ const DecodeForm = () => {
 
       {(method !== 'zwc' && method !== 'homoglyph') && (
         <Box sx={{ my: 2 }}>
-          <Typography>Upload Image:</Typography>
+          <Typography>
+            Upload {method === 'audio' ? 'Audio' : 'Image'}:
+          </Typography>
           <input
             type="file"
-            accept="image/*"
+            accept={method === 'audio' ? 'audio/*' : 'image/*'}
             onChange={(e) => setInputFile(e.target.files[0])}
           />
         </Box>
@@ -115,7 +128,7 @@ const DecodeForm = () => {
       {decodedImage && (
         <Box mt={4}>
           <Typography variant="h6">Hidden Image:</Typography>
-          <img src={decodedImage} alt="Decoded result" style={{ marginBottom: '10px', width: "128px", height:"128px" }} />
+          <img src={decodedImage} alt="Decoded result" style={{ marginBottom: '10px', width: "128px", height: "128px" }} />
         </Box>
       )}
     </Box>
